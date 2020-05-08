@@ -641,12 +641,12 @@ public class LockableResourcesManager extends GlobalConfiguration {
   }
 
     /** Creates the resource */
-  public synchronized boolean createResource(String name, boolean ephemeral) {
+  public synchronized boolean createResource(String name, boolean autoCreateEphemeral) {
     if (name != null) {
       LockableResource existent = fromName(name);
       if (existent == null) {
         LockableResource resource = new LockableResource(name);
-        resource.setEphemeral(ephemeral);
+        resource.setEphemeral(autoCreateEphemeral);
         getResources().add(resource);
         save();
         return true;
