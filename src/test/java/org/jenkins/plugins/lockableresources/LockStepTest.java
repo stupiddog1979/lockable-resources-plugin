@@ -572,10 +572,10 @@ public class LockStepTest extends LockStepTestBase {
   }
 
   @Test
-  @WithTimeout(20)
+  @WithTimeout(180)
   @WithPlugin("jobConfigHistory.hpi")
   public void lockWithLabelConcurrent() throws Exception {
-    final int numberOfThreads = 2;
+    final int numberOfThreads = 50;
     LockableResourcesManager.get().createResourceWithLabel("resource1", "label1");
     final WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
     p.setDefinition(
@@ -584,7 +584,7 @@ public class LockStepTest extends LockStepTestBase {
                 + "Random random = new Random(0);\n"
                 + "lock(label: 'label1') {\n"
                 + "  echo 'Resource locked'\n"
-                + "  sleep 3\n"
+                + "  sleep time: 1000+random.nextInt(2000), unit: 'MILLISECONDS'\n"
                 + "}\n"
                 + "echo 'Finish'",
             true));
