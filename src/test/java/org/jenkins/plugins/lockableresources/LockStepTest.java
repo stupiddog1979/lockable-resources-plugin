@@ -24,6 +24,7 @@ import org.junit.Test;
 import org.jvnet.hudson.test.Issue;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.recipes.WithPlugin;
+import org.jvnet.hudson.test.recipes.WithTimeout;
 
 public class LockStepTest extends LockStepTestBase {
 
@@ -571,8 +572,10 @@ public class LockStepTest extends LockStepTestBase {
   }
 
   @Test
+  @WithTimeout(20)
   @WithPlugin("jobConfigHistory.hpi")
   public void lockWithLabelConcurrent() throws Exception {
+    final int numberOfThreads = 2;
     LockableResourcesManager.get().createResourceWithLabel("resource1", "label1");
     final WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
     p.setDefinition(
@@ -581,19 +584,24 @@ public class LockStepTest extends LockStepTestBase {
                 + "Random random = new Random(0);\n"
                 + "lock(label: 'label1') {\n"
                 + "  echo 'Resource locked'\n"
-                + "  sleep random.nextInt(10)*5\n"
+                + "  sleep 3\n"
                 + "}\n"
                 + "echo 'Finish'",
             true));
-    final CyclicBarrier barrier = new CyclicBarrier(51);
-    for (int i = 0; i < 50; i++) {
+    final CyclicBarrier barrier = new CyclicBarrier(numberOfThreads);
+
+    for (int i = 0; i < numberOfThreads; i++) {
+      System.out.println(String.format("Starting build #%d", i));
       Thread thread =
           new Thread() {
             @Override
             public void run() {
+              final ThreadLocal<WorkflowRun> r;
               try {
                 barrier.await();
                 p.scheduleBuild2(0).waitForStart();
+
+                //j.assertBuildStatusSuccess(j.waitForCompletion(r));
               } catch (Exception e) {
                 System.err.println("Failed to start pipeline job");
               }
@@ -602,7 +610,6 @@ public class LockStepTest extends LockStepTestBase {
       thread.start();
     }
     barrier.await();
-    j.waitUntilNoActivity();
   }
 
   @Test
