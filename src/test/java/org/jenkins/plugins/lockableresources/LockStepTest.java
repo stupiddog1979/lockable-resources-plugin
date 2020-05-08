@@ -575,6 +575,9 @@ public class LockStepTest extends LockStepTestBase {
   @WithTimeout(180)
   @WithPlugin("jobConfigHistory.hpi")
   public void lockWithLabelConcurrent() throws Exception {
+    /* This test does not work on Windows, due to similar problems as described in deleteRunningBuildNewBuildClearsLock. */
+    assumeFalse(Functions.isWindows());
+
     final int numberOfThreads = 50;
     LockableResourcesManager.get().createResourceWithLabel("resource1", "label1");
     final WorkflowJob p = j.jenkins.createProject(WorkflowJob.class, "p");
