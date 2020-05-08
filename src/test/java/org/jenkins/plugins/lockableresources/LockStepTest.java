@@ -581,7 +581,7 @@ public class LockStepTest extends LockStepTestBase {
                 + "Random random = new Random(0);\n"
                 + "lock(label: 'label1') {\n"
                 + "  echo 'Resource locked'\n"
-                + "  sleep random.nextInt(10)*100\n"
+                + "  sleep random.nextInt(10)*5\n"
                 + "}\n"
                 + "echo 'Finish'",
             true));
