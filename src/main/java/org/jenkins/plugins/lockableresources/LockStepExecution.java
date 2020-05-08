@@ -47,7 +47,7 @@ public class LockStepExecution extends AbstractStepExecutionImpl implements Seri
       List<String> resources = new ArrayList<>();
 
       if (resource.resource != null) {
-        if (LockableResourcesManager.get().createResource(resource.resource)) {
+        if (LockableResourcesManager.get().createResource(resource.resource, true)) {
           logger.println("Resource [" + resource + "] did not exist. Created.");
         }
         resources.add(resource.resource);
